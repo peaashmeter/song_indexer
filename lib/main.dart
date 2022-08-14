@@ -119,7 +119,8 @@ class _SongAppState extends State<SongApp> {
       } else {
         try {
           await file.create(recursive: true);
-          var uri = Uri.parse('http://192.168.1.37:8081/${decoded.link}');
+          var uri = Uri.parse(
+              'http://159.65.114.2:8081/${decoded.link.replaceAll('songs/', '')}');
           var request = await client.getUrl(uri);
           var response = await request.close()
             ..pipe(File(pathToFile).openWrite());
