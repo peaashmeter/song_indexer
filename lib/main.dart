@@ -38,21 +38,16 @@ class _SongAppState extends State<SongApp> {
   int loaded = 0;
   @override
   void initState() {
-    fetchDatabase().then((s) {
-      List<String> a = [];
-      for (var song in s) {
-        if (!a.contains(song.artist)) {
-          a.add(song.artist);
+    fetchDatabase().listen((song) {
+      setState(() {
+        songs = songs..add(song);
+        if (!authors.contains(song.artist)) {
+          authors = authors..add(song.artist);
         }
-      }
-
-      setState(
-        () {
-          isLoaded = true;
-          songs = s;
-          authors = a;
-        },
-      );
+      });
+    });
+    setState(() {
+      isLoaded = true;
     });
     super.initState();
   }
@@ -98,12 +93,11 @@ class _SongAppState extends State<SongApp> {
     }
   }
 
-  Future<List<Song>> fetchDatabase() async {
+  Stream<Song> fetchDatabase() async* {
     var json = jsonDecode(widget.jsonString);
 
     var client = HttpClient();
 
-    List<Song> songList = [];
     for (var song in json['songs']) {
       var decoded = Song.fromJson(jsonDecode(song));
       var pathToFile = '${widget.savePath}/${decoded.link}';
@@ -111,30 +105,31 @@ class _SongAppState extends State<SongApp> {
       var file = File(pathToFile);
 
       if (file.existsSync()) {
-        songList.add(decoded);
-        setState(() {
-          loaded++;
-        });
-        continue;
+        yield decoded;
       } else {
         try {
           await file.create(recursive: true);
           var uri = Uri.parse(
               'http://159.65.114.2:8081/${decoded.link.replaceAll('songs/', '')}');
           var request = await client.getUrl(uri);
-          var response = await request.close()
-            ..pipe(File(pathToFile).openWrite());
-          songList.add(decoded);
-          setState(() {
-            loaded++;
-          });
+          var response = await request.close();
+          response.pipe(File(pathToFile).openWrite());
+          yield decoded;
         } catch (e) {
+          print(e);
           continue;
         }
       }
     }
+  }
 
-    return songList;
+  Future handleStream(Stream<Song> songStream) async {
+    await for (final song in songStream) {
+      setState(() {
+        songs = songs..add(song);
+        authors = authors..add(song.artist);
+      });
+    }
   }
 }
 
@@ -274,6 +269,7 @@ class _SongListState extends State<SongList> {
                   return SongCard(
                     name: songs[index].name,
                     artist: songs[index].artist,
+                    pop: songs[index].popularity,
                     link: songs[index].link,
                   );
                 })),
@@ -390,12 +386,14 @@ class _AuthorListState extends State<AuthorList> {
 class SongCard extends StatelessWidget {
   final String name;
   final String artist;
+  final int pop;
   final String link;
 
   const SongCard(
       {super.key,
       required this.name,
       required this.artist,
+      required this.pop,
       required this.link});
 
   @override
@@ -414,17 +412,27 @@ class SongCard extends StatelessWidget {
       }),
       child: Container(
         color: Colors.white,
-        child: Column(
-          children: [
-            Text(
-              name,
-              style: TextStyle(fontSize: 18),
-            ),
-            Text(
-              artist,
-              style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Text(
+                name,
+                style: TextStyle(fontSize: 18),
+              ),
+              Text(
+                artist,
+                style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  '$pop просмотров',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

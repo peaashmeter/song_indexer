@@ -3,29 +3,52 @@ import 'dart:io';
 import 'package:html/parser.dart';
 
 void main(List<String> arguments) async {
+  Map<String, int> songsByPopularity = {};
+
+  var dir = Directory('artists');
+  await for (var artist in dir.list()) {
+    try {
+      var html = await (artist as File).readAsString();
+      var document = parse(html);
+
+      var table = document.getElementById('tablesort');
+      var rows = table!.getElementsByTagName('tr');
+      for (var r in rows.getRange(1, rows.length)) {
+        var columns = r.getElementsByTagName('td');
+        songsByPopularity.addAll({
+          columns[0].children[0].attributes['href']!.replaceAll('../', ''):
+              int.parse(columns[2].text.replaceAll(',', ''))
+        });
+      }
+    } catch (e) {
+      print(e);
+      continue;
+    }
+  }
+
+  var _sorted = songsByPopularity.entries.toList()
+    ..sort(((a, b) => b.value.compareTo(a.value)));
+
+  songsByPopularity = Map.fromEntries(_sorted);
+
   List<Song> songs = [];
 
-  var dir = Directory('songs');
-  await for (var artist in dir.list()) {
-    if (artist is Directory) {
-      await for (var song in artist.list()) {
-        if (song is File) {
-          try {
-            var html = await song.readAsString();
-            var document = parse(html);
+  for (var e in songsByPopularity.entries) {
+    try {
+      var song = File(e.key);
+      var html = await song.readAsString();
+      var document = parse(html);
 
-            var name = document.querySelector('[itemprop=name]')?.text;
-            var artist = document.querySelector('[itemprop=byArtist]')?.text;
+      var name = document.querySelector('[itemprop=name]')?.text;
+      var artist = document.querySelector('[itemprop=byArtist]')?.text;
 
-            var link = song.path;
+      var link = song.path;
 
-            songs.add(Song(name ?? '', artist ?? '', link));
-          } catch (e) {
-            print(e);
-          }
-        }
-      }
-      print('проиндексирован исполнитель ${artist.path}');
+      songs.add(Song(name ?? '', artist ?? '', link, e.value));
+
+      print('Обработано песен: ${songs.length}');
+    } catch (e) {
+      continue;
     }
   }
 
@@ -45,12 +68,18 @@ class Song {
   final String name;
   final String artist;
   final String link;
+  final int popularity;
 
-  Song(this.name, this.artist, this.link);
+  Song(this.name, this.artist, this.link, this.popularity);
 
   Song.fromJson(Map<String, dynamic> json)
-      : this(json['name'], json['artist'], json['link'].replaceAll('\\', '/'));
+      : this(json['name'], json['artist'], json['link'].replaceAll('\\', '/'),
+            json['pop']);
 
-  Map<String, dynamic> toJson() =>
-      {'name': name, 'artist': artist, 'link': link};
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'artist': artist,
+        'link': link.replaceAll('\\', '/'),
+        'pop': popularity
+      };
 }
