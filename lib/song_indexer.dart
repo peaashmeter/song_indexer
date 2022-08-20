@@ -26,10 +26,10 @@ void main(List<String> arguments) async {
     }
   }
 
-  var _sorted = songsByPopularity.entries.toList()
+  var sorted = songsByPopularity.entries.toList()
     ..sort(((a, b) => b.value.compareTo(a.value)));
 
-  songsByPopularity = Map.fromEntries(_sorted);
+  songsByPopularity = Map.fromEntries(sorted);
 
   List<Song> songs = [];
 

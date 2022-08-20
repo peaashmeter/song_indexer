@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:song_indexer/song_indexer.dart';
-import 'package:song_indexer/webview.dart';
+import 'package:song_indexer/songview.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -233,6 +233,7 @@ class _SongListState extends State<SongList> {
                     MaterialPageRoute(
                       builder: (context) => SongView(
                         html: html,
+                        title: song.name,
                       ),
                     ));
               }),
@@ -267,7 +268,7 @@ class _SongListState extends State<SongList> {
                 },
                 itemBuilder: ((context, index) {
                   return SongCard(
-                    name: songs[index].name,
+                    title: songs[index].name,
                     artist: songs[index].artist,
                     pop: songs[index].popularity,
                     link: songs[index].link,
@@ -362,11 +363,14 @@ class _AuthorListState extends State<AuthorList> {
                                 songs: widget.songs
                                     .where((s) => s.artist == authors[index])
                                     .toList())))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        authors[index],
-                        style: TextStyle(fontSize: 18),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          authors[index],
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ),
                     ),
                   );
@@ -384,14 +388,14 @@ class _AuthorListState extends State<AuthorList> {
 }
 
 class SongCard extends StatelessWidget {
-  final String name;
+  final String title;
   final String artist;
   final int pop;
   final String link;
 
   const SongCard(
       {super.key,
-      required this.name,
+      required this.title,
       required this.artist,
       required this.pop,
       required this.link});
@@ -407,6 +411,7 @@ class SongCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => SongView(
                 html: html,
+                title: title,
               ),
             ));
       }),
@@ -414,24 +419,27 @@ class SongCard extends StatelessWidget {
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Text(
-                name,
-                style: TextStyle(fontSize: 18),
-              ),
-              Text(
-                artist,
-                style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  '$pop просмотров',
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Column(
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 18),
+                ),
+                Text(
+                  artist,
                   style: TextStyle(fontSize: 14, color: Colors.grey[800]),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    '$pop просмотров',
+                    style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
