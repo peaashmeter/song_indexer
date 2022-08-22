@@ -234,6 +234,7 @@ class _SongListState extends State<SongList> {
                       builder: (context) => SongView(
                         html: html,
                         title: song.name,
+                        artist: song.artist,
                       ),
                     ));
               }),
@@ -412,6 +413,7 @@ class SongCard extends StatelessWidget {
               builder: (context) => SongView(
                 html: html,
                 title: title,
+                artist: artist,
               ),
             ));
       }),
