@@ -267,8 +267,8 @@ class _SongListState extends State<SongList> {
 
   List<Song> filterSongs(String query) {
     return List.from(widget.songs.where((song) =>
-        song.artist.toLowerCase().contains(query) ||
-        song.name.toLowerCase().contains(query)));
+        song.artist.toLowerCase().contains(query.toLowerCase()) ||
+        song.name.toLowerCase().contains(query.toLowerCase())));
   }
 }
 
@@ -327,7 +327,7 @@ class _AuthorListState extends State<AuthorList> {
                       borderRadius: BorderRadius.all(Radius.circular(25.0)))),
               onChanged: (String query) {
                 setState(() {
-                  authors = filterSongs(query);
+                  authors = filterArtists(query);
                 });
               },
             ),
@@ -366,7 +366,7 @@ class _AuthorListState extends State<AuthorList> {
     );
   }
 
-  List<String> filterSongs(String query) {
+  List<String> filterArtists(String query) {
     return List.from(widget.authors
         .where((a) => a.toLowerCase().contains(query.toLowerCase())));
   }
