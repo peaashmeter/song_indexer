@@ -33,7 +33,7 @@ class SongApp extends StatefulWidget {
 
 class _SongAppState extends State<SongApp> {
   List<Song> songs = [];
-  List<String> authors = [];
+  List<String> artists = [];
   bool isLoaded = false;
   int loaded = 0;
   @override
@@ -41,84 +41,55 @@ class _SongAppState extends State<SongApp> {
     fetchDatabase().listen((song) {
       setState(() {
         songs = songs..add(song);
-        if (!authors.contains(song.artist)) {
-          authors = authors..add(song.artist);
+        if (!artists.contains(song.artist)) {
+          artists = artists..add(song.artist);
         }
       });
-    });
-    setState(() {
-      isLoaded = true;
     });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoaded) {
-      return MaterialApp(
-          title: 'Сборник Песен',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: Scaffold(
-              appBar: AppBar(
-                title: Text('Сборник песен'),
-              ),
-              body: MainMenu(songs, authors)));
-    } else {
-      return MaterialApp(
-          title: 'Сборник Песен',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: Scaffold(
-              appBar: AppBar(
-                title: Text('Сборник песен'),
-              ),
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+    return MaterialApp(
+        title: 'Сборник Песен',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: Scaffold(
+            appBar: AppBar(
+              title: Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('Загружено песен: $loaded'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
+                  Text('Сборник песен'),
                 ],
-              )));
-    }
+              ),
+            ),
+            body: MainMenu(songs, artists)));
   }
 
   Stream<Song> fetchDatabase() async* {
     var json = jsonDecode(widget.jsonString);
 
     var client = HttpClient();
+    print(json['songs'].length);
 
     for (var song in json['songs']) {
       var decoded = Song.fromJson(jsonDecode(song));
       var pathToFile = '${widget.savePath}/${decoded.link}';
 
       var file = File(pathToFile);
+      yield decoded;
 
-      if (file.existsSync()) {
-        yield decoded;
-      } else {
-        try {
-          await file.create(recursive: true);
-          var uri = Uri.parse(
-              'http://159.65.114.2:8081/${decoded.link.replaceAll('songs/', '')}');
-          var request = await client.getUrl(uri);
-          var response = await request.close();
-          response.pipe(File(pathToFile).openWrite());
-          yield decoded;
-        } catch (e) {
-          print(e);
-          continue;
-        }
+      try {
+        await file.create(recursive: true);
+        var uri = Uri.parse(
+            'http://159.65.114.2:8081/${decoded.link.replaceAll('songs/', '')}');
+        var request = await client.getUrl(uri);
+        var response = await request.close();
+        response.pipe(File(pathToFile).openWrite());
+      } catch (e) {
+        print(e);
+        continue;
       }
     }
   }
@@ -127,7 +98,7 @@ class _SongAppState extends State<SongApp> {
     await for (final song in songStream) {
       setState(() {
         songs = songs..add(song);
-        authors = authors..add(song.artist);
+        artists = artists..add(song.artist);
       });
     }
   }
@@ -227,7 +198,20 @@ class _SongListState extends State<SongList> {
               onPressed: (() async {
                 var song = songs[Random().nextInt(songs.length)];
                 var dir = (await getApplicationDocumentsDirectory()).path;
-                var html = await File('$dir/${song.link}').readAsString();
+                late String html;
+                if (await File('$dir/${song.link}').exists()) {
+                  html = await File('$dir/${song.link}').readAsString();
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Ой!'),
+                      content: Text('Кажется, песня еще не загрузилась.'),
+                    ),
+                  );
+                  return;
+                }
+
                 Navigator.push(
                     context,
                     MaterialPageRoute(
