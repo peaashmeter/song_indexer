@@ -106,11 +106,13 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
                         ),
                         IconButton(
                           onPressed: () {
+                            var duration =
+                                getDurationOfAutoScroll(180, scrollController);
                             setState(() {
                               speed = 1;
                               scrollController.animateTo(
                                   scrollController.position.maxScrollExtent,
-                                  duration: Duration(minutes: 3),
+                                  duration: duration,
                                   curve: Curves.linear);
                             });
                           },
@@ -122,11 +124,13 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
                         ),
                         IconButton(
                           onPressed: () {
+                            var duration =
+                                getDurationOfAutoScroll(120, scrollController);
                             setState(() {
                               speed = 2;
                               scrollController.animateTo(
                                   scrollController.position.maxScrollExtent,
-                                  duration: Duration(minutes: 2),
+                                  duration: duration,
                                   curve: Curves.linear);
                             });
                           },
@@ -213,6 +217,15 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
             ),
           ),
         ));
+  }
+
+  //Чем меньше нужно пролистать, тем меньше времени на пролистывание
+  Duration getDurationOfAutoScroll(
+      int fullTime, ScrollController scrollController) {
+    var completed =
+        scrollController.offset / scrollController.position.maxScrollExtent;
+    var seconds = (fullTime * (1 - completed)).toInt();
+    return Duration(seconds: seconds);
   }
 
   String getSongAsText(String html) {
