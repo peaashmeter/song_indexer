@@ -2,17 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'package:html/parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SongView extends StatefulWidget {
   final String html;
   final String title;
   final String artist;
+  final String link;
+  final bool isFavorite;
 
   const SongView(
       {super.key,
       required this.html,
       required this.title,
-      required this.artist});
+      required this.artist,
+      required this.link,
+      required this.isFavorite});
 
   @override
   State<SongView> createState() => _SongViewState();
@@ -27,11 +32,13 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
   int speed = 0;
   double textSize = 16;
   bool isTuningSize = false;
+  late bool isFavorite;
 
   @override
   void initState() {
     scrollController = ScrollController();
     text = getSongAsText(widget.html);
+    isFavorite = widget.isFavorite;
 
     super.initState();
   }
@@ -55,6 +62,31 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
               ),
             ],
           ),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back)),
+          actions: [
+            IconButton(
+                onPressed: () async {
+                  var prefs = await SharedPreferences.getInstance();
+                  var favorite = prefs.getStringList('favorite')!;
+
+                  if (!isFavorite) {
+                    favorite.add(widget.link);
+                  } else {
+                    favorite.remove(widget.link);
+                  }
+                  await prefs.setStringList('favorite', favorite);
+                  setState(() {
+                    isFavorite = !isFavorite;
+                  });
+                },
+                icon: Icon(isFavorite
+                    ? Icons.star_rounded
+                    : Icons.star_border_rounded))
+          ],
         ),
         bottomNavigationBar: BottomAppBar(
           child: Padding(
