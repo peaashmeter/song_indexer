@@ -30,7 +30,7 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
   double sliderHeight = 0;
   double sliderOpacity = 0;
   int speed = 0;
-  double textSize = 16;
+  double textSize = 15;
   bool isTuningSize = false;
   late bool isFavorite;
 
@@ -54,11 +54,20 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
     return Scaffold(
         appBar: AppBar(
           title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(widget.title),
+              Text(
+                widget.title,
+                style: TextStyle(
+                    fontFamily: 'Nunito', fontWeight: FontWeight.w700),
+              ),
               Text(
                 widget.artist,
-                style: TextStyle(fontSize: 14, color: Colors.grey[100]),
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[100],
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -89,133 +98,140 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
           ],
         ),
         bottomNavigationBar: BottomAppBar(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedSize(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.ease,
-                    child: SizedBox(
-                        height: sliderHeight,
-                        child: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.ease,
-                            opacity: sliderOpacity,
-                            child: SliderTheme(
-                              data: SliderThemeData(
-                                  thumbColor: Colors.pink,
-                                  activeTrackColor: Colors.purple,
-                                  inactiveTrackColor: Colors.purple[50]),
-                              child: Slider(
-                                  value: textSize,
-                                  min: 12,
-                                  max: 20,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      textSize = value;
-                                    });
-                                  }),
-                            )))),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              speed = 0;
-                              scrollController.jumpTo(scrollController.offset);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.pause_circle_outline,
-                            size: 32,
-                            color: speed != 0 ? Colors.black : Colors.pink,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            var duration =
-                                getDurationOfAutoScroll(180, scrollController);
-                            setState(() {
-                              speed = 1;
-                              scrollController.animateTo(
-                                  scrollController.position.maxScrollExtent,
-                                  duration: duration,
-                                  curve: Curves.linear);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.keyboard_arrow_right_rounded,
-                            size: 32,
-                            color: speed != 1 ? Colors.black : Colors.pink,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            var duration =
-                                getDurationOfAutoScroll(120, scrollController);
-                            setState(() {
-                              speed = 2;
-                              scrollController.animateTo(
-                                  scrollController.position.maxScrollExtent,
-                                  duration: duration,
-                                  curve: Curves.linear);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.keyboard_double_arrow_right_rounded,
-                            color: speed != 2 ? Colors.black : Colors.pink,
-                            size: 32,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
+          child: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [Colors.deepOrange[50]!, Colors.white])),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedSize(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.ease,
+                      child: SizedBox(
+                          height: sliderHeight,
+                          child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.ease,
+                              opacity: sliderOpacity,
+                              child: SliderTheme(
+                                data: SliderThemeData(
+                                    thumbColor: Colors.pink,
+                                    activeTrackColor: Colors.purple,
+                                    inactiveTrackColor: Colors.purple[50]),
+                                child: Slider(
+                                    value: textSize,
+                                    min: 10,
+                                    max: 20,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        textSize = value;
+                                      });
+                                    }),
+                              )))),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
                             onPressed: () {
                               setState(() {
-                                isTuningSize = !isTuningSize;
-                                sliderHeight = isTuningSize ? 50 : 0;
-                                sliderOpacity = isTuningSize ? 1 : 0;
+                                speed = 0;
+                                scrollController
+                                    .jumpTo(scrollController.offset);
                               });
                             },
                             icon: Icon(
-                              Icons.text_format_outlined,
+                              Icons.pause_circle_outline,
                               size: 32,
-                              color: !isTuningSize ? Colors.black : Colors.pink,
-                            )),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              text = ChordsHandler().transposeUp(text);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.keyboard_arrow_up_rounded,
-                            size: 32,
+                              color: speed != 0 ? Colors.black : Colors.pink,
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              text = ChordsHandler().transposeDown(text);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            size: 32,
+                          IconButton(
+                            onPressed: () {
+                              var duration = getDurationOfAutoScroll(
+                                  180, scrollController);
+                              setState(() {
+                                speed = 1;
+                                scrollController.animateTo(
+                                    scrollController.position.maxScrollExtent,
+                                    duration: duration,
+                                    curve: Curves.linear);
+                              });
+                            },
+                            icon: Icon(
+                              Icons.keyboard_arrow_right_rounded,
+                              size: 32,
+                              color: speed != 1 ? Colors.black : Colors.pink,
+                            ),
                           ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                          IconButton(
+                            onPressed: () {
+                              var duration = getDurationOfAutoScroll(
+                                  120, scrollController);
+                              setState(() {
+                                speed = 2;
+                                scrollController.animateTo(
+                                    scrollController.position.maxScrollExtent,
+                                    duration: duration,
+                                    curve: Curves.linear);
+                              });
+                            },
+                            icon: Icon(
+                              Icons.keyboard_double_arrow_right_rounded,
+                              color: speed != 2 ? Colors.black : Colors.pink,
+                              size: 32,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isTuningSize = !isTuningSize;
+                                  sliderHeight = isTuningSize ? 50 : 0;
+                                  sliderOpacity = isTuningSize ? 1 : 0;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.text_format_outlined,
+                                size: 32,
+                                color:
+                                    !isTuningSize ? Colors.black : Colors.pink,
+                              )),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                text = ChordsHandler().transposeUp(text);
+                              });
+                            },
+                            icon: Icon(
+                              Icons.keyboard_arrow_up_rounded,
+                              size: 32,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                text = ChordsHandler().transposeDown(text);
+                              });
+                            },
+                            icon: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 32,
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -239,9 +255,12 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
                     padding: const EdgeInsets.all(8.0),
                     child: RichText(
                       text: TextSpan(
-                          text: text,
+                          text: text.replaceAll('	', ''),
                           style: TextStyle(
-                              fontSize: textSize, color: Colors.blueGrey[900])),
+                              fontFamily: 'Nunito',
+                              fontWeight: FontWeight.w600,
+                              fontSize: textSize,
+                              color: Colors.blueGrey[900])),
                     ),
                   ),
                 ),

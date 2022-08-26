@@ -1,6 +1,6 @@
 name: song_indexer
 description: A sample command      -line application.
-version: 1.0.5+6
+version: 1.0.6+7
 # homepage: https://www.example.com
 
 environment:
@@ -23,8 +23,20 @@ flutter_icons:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Lobster
+      fonts:
+        - asset: assets/fonts/Lobster-Regular.ttf
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+        - asset: assets/fonts/Nunito-Semibold.ttf
+          weight: 500
+        - asset: assets/fonts/Nunito-Bold.ttf
+          weight: 600
   assets:
   - index/songs.json
+
 
 
    

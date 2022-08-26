@@ -31,7 +31,10 @@ class _AuthorListState extends State<AuthorList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Сборник песен'),
+        title: Text(
+          'Исполнители',
+          style: TextStyle(fontFamily: 'Nunito', fontWeight: FontWeight.w700),
+        ),
         actions: [
           IconButton(
               onPressed: (() {
@@ -54,60 +57,64 @@ class _AuthorListState extends State<AuthorList> {
         ],
       ),
       body: Column(
+        verticalDirection: VerticalDirection.up,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: editingController,
-              decoration: InputDecoration(
-                  labelText: "Поиск",
-                  hintText: "Поиск",
-                  prefixIcon: Icon(Icons.search_outlined),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(25.0)))),
-              onChanged: (String query) {
-                setState(() {
-                  authors = filterArtists(query);
-                });
-              },
-            ),
-          ),
           Expanded(
-            child: ListView.separated(
+            child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: authors.length,
-                separatorBuilder: (context, index) {
-                  return Divider();
-                },
                 itemBuilder: ((context, index) {
-                  return GestureDetector(
-                    onTap: (() {
-                      List<Song> songGenerator() {
-                        return widget.songs
-                            .where((s) => s.artist == authors[index])
-                            .toList();
-                      }
+                  return Ink(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [Colors.deepOrange[50]!, Colors.white])),
+                    child: InkWell(
+                      onTap: (() {
+                        List<Song> songGenerator() {
+                          return widget.songs
+                              .where((s) => s.artist == authors[index])
+                              .toList();
+                        }
 
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SongList(
-                                    songs: songGenerator(),
-                                    songsGenerator: songGenerator,
-                                  )));
-                    }),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SongList(
+                                      songs: songGenerator(),
+                                      songsGenerator: songGenerator,
+                                    )));
+                      }),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(12.0),
                         child: Text(
                           authors[index],
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: 24, fontFamily: 'Nunito'),
+                          overflow: TextOverflow.fade,
                         ),
                       ),
                     ),
                   );
                 })),
+          ),
+          Material(
+            color: Colors.deepOrange[50],
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: editingController,
+                decoration: InputDecoration(
+                  labelText: "Поиск",
+                  hintText: "Поиск",
+                  prefixIcon: Icon(Icons.search_outlined),
+                ),
+                onChanged: (String query) {
+                  setState(() {
+                    authors = filterArtists(query);
+                  });
+                },
+              ),
+            ),
           ),
         ],
       ),

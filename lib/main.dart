@@ -63,8 +63,14 @@ class _SongAppState extends State<SongApp> {
     return MaterialApp(
         title: 'Сборник Песен',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
+            primarySwatch: Colors.pink,
+            appBarTheme: AppBarTheme(backgroundColor: Colors.pink[400]),
+            inputDecorationTheme: InputDecorationTheme(
+                hintStyle: TextStyle(fontFamily: 'Nunito'),
+                labelStyle: TextStyle(fontFamily: 'Nunito'),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.pink),
+                    borderRadius: BorderRadius.all(Radius.circular(25.0))))),
         home: Scaffold(
             appBar: AppBar(
               title: Row(
@@ -222,112 +228,5 @@ class MainMenu extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class SongCard extends StatelessWidget {
-  final String title;
-  final String artist;
-  final int pop;
-  final int maxpop;
-  final String link;
-  final Function() refreshSongsCallback;
-
-  const SongCard(
-      {super.key,
-      required this.title,
-      required this.artist,
-      required this.pop,
-      required this.maxpop,
-      required this.link,
-      required this.refreshSongsCallback});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (() async {
-        var dir = (await getApplicationDocumentsDirectory()).path;
-        late String html;
-
-        if (await File('$dir/$link').exists()) {
-          html = await File('$dir/$link').readAsString();
-        } else {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Ой!'),
-              content: Text('Кажется, песня еще не загрузилась.'),
-            ),
-          );
-          return;
-        }
-
-        var isFavorite = await checkIfFavorite(link);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SongView(
-                html: html,
-                title: title,
-                artist: artist,
-                link: link,
-                isFavorite: isFavorite,
-              ),
-            )).then((value) => refreshSongsCallback.call());
-      }),
-      child: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Column(
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 18),
-                ),
-                Text(
-                  artist,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                              left: MediaQuery.of(context).size.width / 3,
-                              right: 8),
-                          child: Icon(Icons.trending_up_rounded),
-                        ),
-                        Container(
-                          height: 5,
-                          decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.purple, Colors.pink],
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5))),
-                          width: 100 * sqrt(pop) / sqrt(maxpop),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<bool> checkIfFavorite(String link) async {
-    var prefs = await SharedPreferences.getInstance();
-    var favorite = prefs.getStringList('favorite');
-    return favorite!.contains(link);
   }
 }

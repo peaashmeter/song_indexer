@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:song_indexer/main.dart';
+import 'package:song_indexer/song_card.dart';
 import 'package:song_indexer/songview.dart';
 
 import 'song_indexer.dart';
@@ -36,7 +37,10 @@ class _SongListState extends State<SongList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Сборник песен'),
+        title: Text(
+          'Сборник песен',
+          style: TextStyle(fontFamily: 'Nunito', fontWeight: FontWeight.w700),
+        ),
         actions: [
           IconButton(
               onPressed: (() async {
@@ -72,32 +76,35 @@ class _SongListState extends State<SongList> {
               icon: Icon(Icons.casino_rounded))
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          decoration: BoxDecoration(color: Colors.pink[400]),
+          child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: editingController,
-              decoration: InputDecoration(
-                  labelText: "Поиск",
-                  hintText: "Поиск",
-                  prefixIcon: Icon(Icons.search_outlined),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(25.0)))),
-              onChanged: (String query) {
-                setState(() {
-                  songs = filterSongs(query);
-                });
-              },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(Icons.music_note_rounded),
+                Text(
+                  'Загружено ${widget.songs.length} песен',
+                  style: TextStyle(
+                      fontFamily: 'Nunito',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                ),
+                Icon(Icons.music_note_rounded),
+              ],
             ),
           ),
+        ),
+      ),
+      body: Column(
+        verticalDirection: VerticalDirection.up,
+        children: [
           Expanded(
-            child: ListView.separated(
+            child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: songs.length,
-                separatorBuilder: (context, index) {
-                  return Divider();
-                },
                 itemBuilder: ((context, index) {
                   return SongCard(
                       title: songs[index].name,
@@ -112,6 +119,26 @@ class _SongListState extends State<SongList> {
                         });
                       }));
                 })),
+          ),
+          Material(
+            color: Colors.deepOrange[50],
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: editingController,
+                decoration: InputDecoration(
+                  labelText: "Поиск",
+                  hintText: "Поиск",
+                  prefixIcon: Icon(Icons.search_outlined),
+                ),
+                onChanged: (String query) {
+                  setState(() {
+                    songs = filterSongs(query);
+                  });
+                },
+              ),
+            ),
           ),
         ],
       ),
