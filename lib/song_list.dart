@@ -98,54 +98,54 @@ class _SongListState extends State<SongList> {
           ),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-            gradient:
-                LinearGradient(colors: [Colors.deepOrange[50]!, Colors.white])),
-        child: Column(
-          verticalDirection: VerticalDirection.up,
-          children: [
-            Expanded(
-              child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: songs.length,
-                  itemBuilder: ((context, index) {
-                    return SongCard(
-                        title: songs[index].name,
-                        artist: songs[index].artist,
-                        pop: songs[index].popularity,
-                        link: songs[index].link,
-                        maxpop: songs.first.popularity,
-                        refreshSongsCallback: (() async {
-                          var songs_ = await widget.songsGenerator();
-                          setState(() {
-                            songs = songs_;
-                          });
-                        }));
-                  })),
-            ),
-            Material(
-              color: Colors.deepOrange[50],
-              elevation: 5,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: editingController,
-                  decoration: InputDecoration(
-                    labelText: "Поиск",
-                    hintText: "Поиск",
-                    prefixIcon: Icon(Icons.search_outlined),
-                  ),
-                  onChanged: (String query) {
-                    setState(() {
-                      songs = filterSongs(query);
-                    });
-                  },
+      body: Column(
+        verticalDirection: VerticalDirection.up,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [Colors.deepOrange[50]!, Colors.white])),
+          ),
+          Expanded(
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: songs.length,
+                itemBuilder: ((context, index) {
+                  return SongCard(
+                      title: songs[index].name,
+                      artist: songs[index].artist,
+                      pop: songs[index].popularity,
+                      link: songs[index].link,
+                      maxpop: songs.first.popularity,
+                      refreshSongsCallback: (() async {
+                        var songs_ = await widget.songsGenerator();
+                        setState(() {
+                          songs = songs_;
+                        });
+                      }));
+                })),
+          ),
+          Material(
+            color: Colors.deepOrange[50],
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: editingController,
+                decoration: InputDecoration(
+                  labelText: "Поиск",
+                  hintText: "Поиск",
+                  prefixIcon: Icon(Icons.search_outlined),
                 ),
+                onChanged: (String query) {
+                  setState(() {
+                    songs = filterSongs(query);
+                  });
+                },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
