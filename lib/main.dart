@@ -93,7 +93,10 @@ class _SongAppState extends State<SongApp> {
       var pathToFile = '${widget.savePath}/${decoded.link}';
 
       var file = File(pathToFile);
-      yield decoded;
+      if (await file.exists()) {
+        yield decoded;
+        continue;
+      }
 
       try {
         await file.create(recursive: true);
@@ -102,6 +105,7 @@ class _SongAppState extends State<SongApp> {
         var request = await client.getUrl(uri);
         var response = await request.close();
         response.pipe(File(pathToFile).openWrite());
+        yield decoded;
       } catch (e) {
         print(e);
         continue;
