@@ -4,6 +4,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:html/parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'chords.dart';
+
 class SongView extends StatefulWidget {
   final String html;
   final String title;
@@ -78,6 +80,12 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
               icon: Icon(Icons.arrow_back)),
           actions: [
             IconButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => LetterList()));
+                },
+                icon: Icon(Icons.help_outline_rounded)),
+            IconButton(
                 onPressed: () async {
                   var prefs = await SharedPreferences.getInstance();
                   var favorite = prefs.getStringList('favorite')!;
@@ -100,8 +108,8 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
         bottomNavigationBar: BottomAppBar(
           child: Container(
             decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.deepOrange[50]!, Colors.white])),
+              color: Colors.deepOrange[50],
+            ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(

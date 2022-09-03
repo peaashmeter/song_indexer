@@ -25,88 +25,83 @@ class SongCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Ink(
-      decoration: BoxDecoration(
-          gradient:
-              LinearGradient(colors: [Colors.deepOrange[50]!, Colors.white])),
-      child: InkWell(
-        onTap: (() async {
-          var dir = (await getApplicationDocumentsDirectory()).path;
-          late String html;
+    return InkWell(
+      onTap: (() async {
+        var dir = (await getApplicationDocumentsDirectory()).path;
+        late String html;
 
-          if (await File('$dir/$link').exists()) {
-            html = await File('$dir/$link').readAsString();
-          } else {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text('Ой!'),
-                content: Text('Кажется, песня еще не загрузилась.'),
-              ),
-            );
-            return;
-          }
+        if (await File('$dir/$link').exists()) {
+          html = await File('$dir/$link').readAsString();
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Ой!'),
+              content: Text('Кажется, песня еще не загрузилась.'),
+            ),
+          );
+          return;
+        }
 
-          var isFavorite = await checkIfFavorite(link);
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SongView(
-                  html: html,
-                  title: title,
-                  artist: artist,
-                  link: link,
-                  isFavorite: isFavorite,
-                ),
-              )).then((value) => refreshSongsCallback.call());
-        }),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width / 1.67,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      overflow: TextOverflow.fade,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blueGrey[900]),
-                    ),
-                    Text(artist,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.blueGrey[800],
-                          fontFamily: 'Nunito',
-                        ),
-                        overflow: TextOverflow.ellipsis),
-                  ],
-                ),
+        var isFavorite = await checkIfFavorite(link);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SongView(
+                html: html,
+                title: title,
+                artist: artist,
+                link: link,
+                isFavorite: isFavorite,
               ),
-              Row(
+            )).then((value) => refreshSongsCallback.call());
+      }),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 1.67,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Icon(Icons.trending_up_rounded),
+                  Text(
+                    title,
+                    overflow: TextOverflow.fade,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'Nunito',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blueGrey[900]),
                   ),
-                  Container(
-                    height: 5,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.purple, Colors.pink],
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(5))),
-                    width: 100 * sqrt(pop) / sqrt(maxpop),
-                  ),
+                  Text(artist,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blueGrey[800],
+                        fontFamily: 'Nunito',
+                      ),
+                      overflow: TextOverflow.ellipsis),
                 ],
               ),
-            ],
-          ),
+            ),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Icon(Icons.trending_up_rounded),
+                ),
+                Container(
+                  height: 5,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.purple, Colors.pink],
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(5))),
+                  width: 100 * sqrt(pop) / sqrt(maxpop),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

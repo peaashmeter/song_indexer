@@ -65,9 +65,8 @@ class _AuthorListState extends State<AuthorList> {
                 itemCount: authors.length,
                 itemBuilder: ((context, index) {
                   return Ink(
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Colors.deepOrange[50]!, Colors.white])),
+                    decoration:
+                        BoxDecoration(color: Colors.orange.withAlpha(10)),
                     child: InkWell(
                       onTap: (() {
                         List<Song> songGenerator() {
@@ -88,7 +87,7 @@ class _AuthorListState extends State<AuthorList> {
                         padding: const EdgeInsets.all(12.0),
                         child: Text(
                           authors[index],
-                          style: TextStyle(fontSize: 24, fontFamily: 'Nunito'),
+                          style: TextStyle(fontSize: 20, fontFamily: 'Nunito'),
                           overflow: TextOverflow.fade,
                         ),
                       ),
