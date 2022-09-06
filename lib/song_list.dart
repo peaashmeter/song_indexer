@@ -119,7 +119,7 @@ class _SongListState extends State<SongList> {
                         refreshSongsCallback: (() async {
                           var songs_ = await widget.songsGenerator();
                           setState(() {
-                            songs = songs_;
+                            songs = filterSongs(editingController.text);
                           });
                         }));
                   })),
