@@ -5,9 +5,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:song_indexer/main.dart';
 import 'package:song_indexer/song_card.dart';
 import 'package:song_indexer/songview.dart';
+import 'package:song_indexer/transpose_data.dart';
 
 import 'song_indexer.dart';
 
@@ -59,6 +59,9 @@ class _SongListState extends State<SongList> {
                   );
                   return;
                 }
+
+                var trMap = await TransposeDataHandler().getTranspositionMap();
+                var initialTransposition = trMap[song.link] ?? 0;
                 var isFavorite = await checkIfFavorite(song.link);
 
                 Navigator.push(
@@ -70,6 +73,7 @@ class _SongListState extends State<SongList> {
                         artist: song.artist,
                         link: song.link,
                         isFavorite: isFavorite,
+                        initialTransposition: initialTransposition,
                       ),
                     ));
               }),

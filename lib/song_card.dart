@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:song_indexer/songview.dart';
+import 'package:song_indexer/transpose_data.dart';
 
 class SongCard extends StatelessWidget {
   final String title;
@@ -43,6 +44,9 @@ class SongCard extends StatelessWidget {
           return;
         }
 
+        var trMap = await TransposeDataHandler().getTranspositionMap();
+        var initialTransposition = trMap[link] ?? 0;
+
         var isFavorite = await checkIfFavorite(link);
         Navigator.push(
             context,
@@ -53,6 +57,7 @@ class SongCard extends StatelessWidget {
                 artist: artist,
                 link: link,
                 isFavorite: isFavorite,
+                initialTransposition: initialTransposition,
               ),
             )).then((value) => refreshSongsCallback.call());
       }),

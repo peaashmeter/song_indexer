@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 
 import 'package:html/parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:song_indexer/transpose_data.dart';
 
 import 'chords.dart';
 
@@ -12,6 +13,7 @@ class SongView extends StatefulWidget {
   final String artist;
   final String link;
   final bool isFavorite;
+  final int initialTransposition;
 
   const SongView(
       {super.key,
@@ -19,7 +21,8 @@ class SongView extends StatefulWidget {
       required this.title,
       required this.artist,
       required this.link,
-      required this.isFavorite});
+      required this.isFavorite,
+      required this.initialTransposition});
 
   @override
   State<SongView> createState() => _SongViewState();
@@ -36,11 +39,18 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
   bool isTuningSize = false;
   late bool isFavorite;
 
+  late int transposition;
+
   @override
   void initState() {
     scrollController = ScrollController();
     text = getSongAsText(widget.html);
+
     isFavorite = widget.isFavorite;
+    transposition = widget.initialTransposition;
+    for (var i = 0; i < transposition; i++) {
+      text = ChordsHandler().transposeUp(text);
+    }
 
     super.initState();
   }
@@ -216,7 +226,10 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
                             onPressed: () {
                               setState(() {
                                 text = ChordsHandler().transposeUp(text);
+                                transposition = (transposition + 1) % 12;
                               });
+                              TransposeDataHandler()
+                                  .addTransposition(widget.link, transposition);
                             },
                             icon: Icon(
                               Icons.keyboard_arrow_up_rounded,
@@ -227,13 +240,32 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
                             onPressed: () {
                               setState(() {
                                 text = ChordsHandler().transposeDown(text);
+                                transposition = (transposition - 1) % 12;
                               });
+                              TransposeDataHandler()
+                                  .addTransposition(widget.link, transposition);
                             },
                             icon: Icon(
                               Icons.keyboard_arrow_down_rounded,
                               size: 32,
                             ),
-                          )
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  for (var i = 0; i < transposition; i++) {
+                                    text = ChordsHandler().transposeDown(text);
+                                  }
+                                  transposition = 0;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.restore_outlined,
+                                color: transposition == 0
+                                    ? Colors.black
+                                    : Colors.pink,
+                                size: 32,
+                              ))
                         ],
                       ),
                     ],
@@ -334,6 +366,7 @@ class ChordsHandler {
     var song_ = song;
     song_ = song_.replaceAllMapped(
         chordRegex, (match) => _transposeUpChord(match.group(0)!));
+
     return song_;
   }
 
