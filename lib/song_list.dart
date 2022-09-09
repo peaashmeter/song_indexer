@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:song_indexer/main.dart';
 import 'package:song_indexer/song_card.dart';
 import 'package:song_indexer/songview.dart';
 import 'package:song_indexer/transpose_data.dart';
@@ -26,10 +27,14 @@ class _SongListState extends State<SongList> {
   late TextEditingController editingController;
   late List<Song> songs;
 
+  late bool downloading;
+
   @override
   void initState() {
     editingController = TextEditingController();
     songs = widget.songs;
+    downloading = prefs.getBool('downloading') ?? false;
+
     super.initState();
   }
 

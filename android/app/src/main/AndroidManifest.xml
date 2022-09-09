@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.song_indexer">
+    package="com.ivanyr.songindexer">
    <application
-        android:label="song_indexer"
+        android:label="Песенник"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

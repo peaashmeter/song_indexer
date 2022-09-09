@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -9,33 +9,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:song_indexer/chords.dart';
 import 'package:song_indexer/song_indexer.dart';
 import 'package:song_indexer/song_list.dart';
-import 'package:song_indexer/songview.dart';
 
 import 'author_list.dart';
+
+late SharedPreferences prefs;
+late StreamHandler streamHandler;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  var indexJsonString = await rootBundle.loadString('index/songs.json');
+  var jsonString = await rootBundle.loadString('index/songs.json');
   var savePath = (await getApplicationDocumentsDirectory()).path;
 
-  var prefs = await SharedPreferences.getInstance();
+  prefs = await SharedPreferences.getInstance();
   if (prefs.getStringList('favorite') == null) {
-    prefs.setStringList('favorite', []);
+    await prefs.setStringList('favorite', []);
   }
 
-  //File songsFile = File('index/songs.json');
+  streamHandler = StreamHandler(jsonString, savePath);
 
-  //var jsonString = await songsFile.readAsString();
-
-  runApp(SongApp(indexJsonString, savePath));
+  runApp(SongApp());
 }
 
 class SongApp extends StatefulWidget {
-  final String jsonString;
-  final String savePath;
-
-  const SongApp(this.jsonString, this.savePath, {Key? key}) : super(key: key);
+  const SongApp({Key? key}) : super(key: key);
 
   @override
   State<SongApp> createState() => _SongAppState();
@@ -44,11 +41,12 @@ class SongApp extends StatefulWidget {
 class _SongAppState extends State<SongApp> {
   List<Song> songs = [];
   List<String> artists = [];
-  bool isLoaded = false;
   int loaded = 0;
+
+  late StreamSubscription<Song> subscription;
   @override
   void initState() {
-    fetchDatabase().listen((song) {
+    subscription = streamHandler.stream.listen((song) {
       setState(() {
         songs = songs..add(song);
         if (!artists.contains(song.artist)) {
@@ -56,6 +54,17 @@ class _SongAppState extends State<SongApp> {
         }
       });
     });
+    streamHandler.addListener(() {
+      subscription = streamHandler.stream.listen((song) {
+        setState(() {
+          songs = songs..add(song);
+          if (!artists.contains(song.artist)) {
+            artists = artists..add(song.artist);
+          }
+        });
+      });
+    });
+
     super.initState();
   }
 
@@ -82,22 +91,42 @@ class _SongAppState extends State<SongApp> {
             ),
             body: MainMenu(songs, artists)));
   }
+}
+
+class StreamHandler extends ChangeNotifier {
+  final String jsonString;
+  final String savePath;
+
+  late int index;
+
+  late bool downloading;
+
+  late Stream<Song> stream;
+  late dynamic json;
+
+  StreamHandler(this.jsonString, this.savePath) {
+    stream = fetchDatabase();
+    index = 0;
+    json = jsonDecode(jsonString);
+    downloading = prefs.getBool('downloading') ?? true;
+  }
 
   Stream<Song> fetchDatabase() async* {
-    var json = jsonDecode(widget.jsonString);
-
     var client = HttpClient();
-    print(json['songs'].length);
 
-    for (var song in json['songs']) {
+    for (var song in (json['songs'] as List).skip(index)) {
       var decoded = Song.fromJson(jsonDecode(song));
-      var pathToFile = '${widget.savePath}/${decoded.link}';
+      var pathToFile = '$savePath/${decoded.link}';
 
       var file = File(pathToFile);
       if (await file.exists()) {
+        index++;
         yield decoded;
+
         continue;
       }
+
+      if (!downloading) break;
 
       try {
         await file.create(recursive: true);
@@ -106,21 +135,23 @@ class _SongAppState extends State<SongApp> {
         var request = await client.getUrl(uri);
         var response = await request.close();
         response.pipe(File(pathToFile).openWrite());
+        index++;
         yield decoded;
       } catch (e) {
-        print(e);
+        index++;
         continue;
       }
     }
   }
 
-  Future handleStream(Stream<Song> songStream) async {
-    await for (final song in songStream) {
-      setState(() {
-        songs = songs..add(song);
-        artists = artists..add(song.artist);
-      });
-    }
+  void pause() {
+    downloading = false;
+  }
+
+  void resume() {
+    downloading = true;
+    stream = fetchDatabase();
+    notifyListeners();
   }
 }
 
@@ -173,7 +204,6 @@ class MainMenu extends StatelessWidget {
                 onTap: (() async {
                   Future<List<Song>> Function() songsGenerator;
                   songsGenerator = () async {
-                    var prefs = await SharedPreferences.getInstance();
                     var favorites = prefs.getStringList('favorite') ?? [];
                     return songs
                         .where((s) => favorites.contains(s.link))
@@ -204,6 +234,14 @@ class MainMenu extends StatelessWidget {
                       title: 'Аккорды',
                       subtitle: 'Как это играть',
                       iconData: Icons.help_rounded)),
+              SwitchTile(
+                  title: 'Скачивание песен',
+                  iconData: Icons.downloading_outlined,
+                  onChanged: (value) async {
+                    await prefs.setBool('downloading', value);
+
+                    value ? streamHandler.resume() : streamHandler.pause();
+                  })
             ],
           ),
         ),
@@ -237,6 +275,54 @@ class MenuTile extends StatelessWidget {
           subtitle,
           style: TextStyle(fontFamily: 'Nunito'),
         ),
+      ),
+    );
+  }
+}
+
+class SwitchTile extends StatefulWidget {
+  final String title;
+
+  final IconData iconData;
+  final Function(bool) onChanged;
+
+  const SwitchTile(
+      {Key? key,
+      required this.title,
+      required this.iconData,
+      required this.onChanged})
+      : super(key: key);
+
+  @override
+  State<SwitchTile> createState() => _SwitchTileState();
+}
+
+class _SwitchTileState extends State<SwitchTile> {
+  late bool downloading;
+
+  @override
+  void initState() {
+    downloading = prefs.getBool('downloading') ?? true;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: ListTile(
+        leading: Icon(widget.iconData),
+        title: Text(
+          widget.title,
+          style: TextStyle(fontFamily: 'Nunito', fontSize: 20),
+        ),
+        trailing: Switch(
+            value: downloading,
+            onChanged: (value) async {
+              setState(() {
+                downloading = value;
+              });
+              await widget.onChanged(value);
+            }),
       ),
     );
   }

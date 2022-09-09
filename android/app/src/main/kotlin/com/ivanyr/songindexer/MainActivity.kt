@@ -1,4 +1,4 @@
-package com.example.song_indexer
+package com.ivanyr.songindexer
 
 import io.flutter.embedding.android.FlutterActivity
 
