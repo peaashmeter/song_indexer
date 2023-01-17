@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:song_indexer/songview.dart';
-import 'package:song_indexer/transpose_data.dart';
+import 'package:song_indexer/transpose_handler.dart';
 
 class SongCard extends StatelessWidget {
   final String title;

@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:song_indexer/main.dart';
 import 'package:song_indexer/song_card.dart';
 import 'package:song_indexer/songview.dart';
-import 'package:song_indexer/transpose_data.dart';
+import 'package:song_indexer/transpose_handler.dart';
 
 import 'song_indexer.dart';
 

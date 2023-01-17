@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'package:html/parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:song_indexer/transpose_data.dart';
+import 'package:song_indexer/note_handler.dart';
+import 'package:song_indexer/transpose_handler.dart';
 
 import 'chords.dart';
 
@@ -89,6 +91,10 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
               },
               icon: Icon(Icons.arrow_back)),
           actions: [
+            IconButton(
+              onPressed: () => _editNote(),
+              icon: Icon(Icons.edit_note_rounded),
+            ),
             IconButton(
                 onPressed: () {
                   Navigator.push(context,
@@ -324,6 +330,34 @@ class _SongViewState extends State<SongView> with TickerProviderStateMixin {
     var text = document.querySelector('[itemprop="chordsBlock"]')?.text ?? '';
 
     return ChordsHandler().easeChords(text);
+  }
+
+  _editNote() async {
+    final notesMap = await NotesDataHandler().getNotesMap();
+    final initialNote = notesMap[widget.link] ?? '';
+    final controller = TextEditingController(text: initialNote);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: Text(
+            'Заметка',
+            style: TextStyle(
+                fontFamily: 'Nunito',
+                fontWeight: FontWeight.w700,
+                color: Colors.blueGrey[900]),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4.0),
+              )),
+              maxLines: 5,
+            ),
+          )),
+    ).then((_) => NotesDataHandler().setNote(widget.link, controller.text));
   }
 }
 
