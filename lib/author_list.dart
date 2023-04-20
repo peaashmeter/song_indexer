@@ -1,10 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:song_indexer/song_indexer.dart';
 
 import 'package:song_indexer/song_list.dart';
-
-import 'song_indexer.dart';
 
 class AuthorList extends StatefulWidget {
   final List<Song> songs;
@@ -69,17 +68,17 @@ class _AuthorListState extends State<AuthorList> {
                         BoxDecoration(color: Colors.orange.withAlpha(10)),
                     child: InkWell(
                       onTap: (() {
-                        List<Song> songGenerator() {
-                          return widget.songs
+                        Iterable<Song> songGenerator() sync* {
+                          yield widget.songs
                               .where((s) => s.artist == authors[index])
-                              .toList();
+                              .elementAt(index);
                         }
 
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => SongList(
-                                      songs: songGenerator(),
+                                      songs: songGenerator().toList(),
                                       songsGenerator: songGenerator,
                                     )));
                       }),
