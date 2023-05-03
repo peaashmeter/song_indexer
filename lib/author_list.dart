@@ -68,10 +68,9 @@ class _AuthorListState extends State<AuthorList> {
                         BoxDecoration(color: Colors.orange.withAlpha(10)),
                     child: InkWell(
                       onTap: (() {
-                        Iterable<Song> songGenerator() sync* {
-                          yield widget.songs
-                              .where((s) => s.artist == authors[index])
-                              .elementAt(index);
+                        Iterable<Song> songGenerator() {
+                          return widget.songs
+                              .where((s) => s.artist == authors[index]);
                         }
 
                         Navigator.push(
