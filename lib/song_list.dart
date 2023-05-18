@@ -126,7 +126,6 @@ class _SongListState extends State<SongList> {
                         link: songs[index].link,
                         maxpop: songs.first.popularity,
                         refreshSongsCallback: (() async {
-                          var songs_ = await widget.songsGenerator();
                           setState(() {
                             songs = filterSongs(editingController.text);
                           });

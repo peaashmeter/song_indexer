@@ -89,22 +89,33 @@ class SongCard extends StatelessWidget {
                 ],
               ),
             ),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Icon(Icons.trending_up_rounded),
-                ),
-                Container(
-                  height: 5,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.purple, Colors.pink],
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(5))),
-                  width: 100 * sqrt(pop) / sqrt(maxpop),
-                ),
-              ],
+            FutureBuilder(
+              future: checkIfFavorite(link),
+              initialData: false,
+              builder: (context, snapshot) {
+                return Row(
+                  children: [
+                    Icon(
+                      Icons.star_rounded,
+                      color: Colors.black
+                          .withOpacity(snapshot.data ?? false ? 1 : 0),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(Icons.trending_up_rounded),
+                    ),
+                    Container(
+                      height: 5,
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.purple, Colors.pink],
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      width: 70 * sqrt(pop) / sqrt(maxpop),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),
