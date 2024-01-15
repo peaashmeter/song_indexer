@@ -80,7 +80,8 @@ class _SongAppState extends State<SongApp> {
                 labelStyle: TextStyle(fontFamily: 'Nunito'),
                 border: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.pink),
-                    borderRadius: BorderRadius.all(Radius.circular(25.0))))),
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+            useMaterial3: false),
         home: Scaffold(
             appBar: AppBar(
               title: Row(

@@ -1,6 +1,6 @@
 name: song_indexer
 description: A sample command-line application.
-version: 1.0.15+16
+version: 1.0.16+17
 # homepage: https://www.example.com
 
 environment:
