@@ -10,7 +10,7 @@ import 'package:song_indexer/song_card.dart';
 import 'package:song_indexer/songview.dart';
 import 'package:song_indexer/transpose_handler.dart';
 
-import 'song_indexer.dart';
+import 'song.dart';
 
 class SongList extends StatefulWidget {
   final FutureOr<Iterable<Song>> Function() songsGenerator;

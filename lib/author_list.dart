@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:song_indexer/song_indexer.dart';
 
 import 'package:song_indexer/song_list.dart';
+
+import 'song.dart';
 
 class AuthorList extends StatefulWidget {
   final List<Song> songs;

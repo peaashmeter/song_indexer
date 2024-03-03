@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:song_indexer/chords.dart';
-import 'package:song_indexer/song_indexer.dart';
 import 'package:song_indexer/song_list.dart';
 
 import 'author_list.dart';
+import 'song.dart';
 
 late SharedPreferences prefs;
 late StreamHandler streamHandler;
