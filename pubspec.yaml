@@ -1,6 +1,6 @@
 name: song_indexer
 description: A sample command-line application.
-version: 1.0.17+18
+version: 1.0.18+19
 # homepage: https://www.example.com
 
 environment:
@@ -13,7 +13,14 @@ dev_dependencies:
   lints: ^2.0.0
   test: ^1.16.0
 dependencies:
-  { change_app_package_name: ^1.1.0, flutter: { sdk: flutter }, flutter_launcher_icons: ^0.10.0, html: ^0.15.0, path_provider: ^2.0.11, shared_preferences: ^2.0.15}
+  {
+    change_app_package_name: ^1.1.0,
+    flutter: { sdk: flutter },
+    flutter_launcher_icons: ^0.10.0,
+    html: ^0.15.0,
+    path_provider: ^2.0.11,
+    shared_preferences: ^2.0.15,
+  }
 
 flutter_icons:
   android: "launcher_icon"
@@ -37,9 +44,5 @@ flutter:
         - asset: assets/fonts/Nunito-Bold.ttf
           weight: 600
   assets:
-  - index/songs.json
-  - assets/chords/
-
-
-
-   
+    - index/songs.json
+    - assets/chords/

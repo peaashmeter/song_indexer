@@ -12,6 +12,8 @@ import 'package:song_indexer/song_list.dart';
 import 'author_list.dart';
 import 'song.dart';
 
+const endpoint = 'http://45.91.8.102:8081';
+
 late SharedPreferences prefs;
 late StreamHandler streamHandler;
 
@@ -131,8 +133,8 @@ class StreamHandler extends ChangeNotifier {
 
       try {
         await file.create(recursive: true);
-        var uri = Uri.parse(
-            'http://159.65.114.2:8081/${decoded.link.replaceAll('songs/', '')}');
+        var uri =
+            Uri.parse('$endpoint/${decoded.link.replaceAll('songs/', '')}');
         var request = await client.getUrl(uri);
         var response = await request.close();
         response.pipe(File(pathToFile).openWrite());
